@@ -198,6 +198,13 @@ def main(argv=None):
         default=[1, 10, 20, 50, 100],
         help='List of cached query levels to benchmark')
 
+    #Option to add kamon markings
+    parser.add_argument(
+        '--kamon-args',
+        nargs='+',
+        default=[],
+        help='Extra influxdb tag values kamon passes to java.')
+
     # Network options
     parser.add_argument(
         '--network-mode',

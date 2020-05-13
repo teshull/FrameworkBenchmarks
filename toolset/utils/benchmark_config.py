@@ -57,6 +57,7 @@ class BenchmarkConfig:
         self.server_docker_host = None
         self.database_docker_host = None
         self.client_docker_host = None
+        self.kamon_args = args.kamon_args
         self.network = None
 
         if self.network_mode is None:

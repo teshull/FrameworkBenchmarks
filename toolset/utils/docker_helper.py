@@ -26,12 +26,19 @@ class DockerHelper:
             base_url=self.benchmarker.config.server_docker_host)
         self.database = docker.DockerClient(
             base_url=self.benchmarker.config.database_docker_host)
+        self.kamon_args = benchmarker.config.kamon_args
 
     def __build(self, base_url, path, build_log_file, log_prefix, dockerfile,
                 tag, buildargs={}):
         '''
         Builds docker containers using docker-py low-level api
         '''
+
+        if len(self.kamon_args) > 0:
+            args = ""
+            for arg in self.kamon_args:
+                args += " -Dkamon.environment.tags.%s" % arg
+            buildargs["kamon_args"]=args
 
         self.benchmarker.time_logger.mark_build_start()
         with open(build_log_file, 'w') as build_log:
