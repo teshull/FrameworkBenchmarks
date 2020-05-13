@@ -93,6 +93,10 @@ def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None):
     pipelineConcurrencyLevels = benchmark.getPipelineConcurrencyLevels()
     queryLevels = benchmark.getQueryLevels()
 
+    #ensuring log dir exists
+    if log_dir is not None:
+        os.mkdir(log_dir)
+
     command_prefix = "./tfb --mode %s --test %s --type %s" \
         % (mode, framework, benchmark.name)
 
