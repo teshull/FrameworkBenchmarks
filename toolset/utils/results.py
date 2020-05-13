@@ -24,8 +24,12 @@ class Results:
         '''
         self.benchmarker = benchmarker
         self.config = benchmarker.config
-        self.directory = os.path.join(self.config.results_root,
-                                      self.config.timestamp)
+        if self.config.results_dir is not None:
+            self.directory = os.path.join(self.config.results_root,
+                                        self.config.results_dir)
+        else:
+            self.directory = os.path.join(self.config.results_root,
+                                        self.config.timestamp)
         try:
             os.makedirs(self.directory)
         except OSError:

@@ -47,6 +47,7 @@ class BenchmarkConfig:
         self.parse = args.parse
         self.results_environment = args.results_environment
         self.results_name = args.results_name
+        self.results_dir = args.results_dir
         self.results_upload_uri = args.results_upload_uri
         self.test = args.test
         self.test_dir = args.test_dir
