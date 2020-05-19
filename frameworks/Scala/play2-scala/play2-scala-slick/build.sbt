@@ -11,5 +11,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "5.0.0",
   "mysql" % "mysql-connector-java" % "8.0.19",
   "io.kamon" %% "kamon-bundle" % "2.1.0",
+  "io.kamon" %% "kamon-influxdb" % "2.1.0",
   filters
 )

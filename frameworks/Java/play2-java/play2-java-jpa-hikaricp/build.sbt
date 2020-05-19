@@ -11,7 +11,8 @@ libraryDependencies ++= Seq(
   javaJpa,
   "mysql" % "mysql-connector-java" % "8.0.19",
   "org.hibernate" % "hibernate-core" % "5.4.12.Final",
-  "io.kamon" %% "kamon-bundle" % "2.1.0"
+  "io.kamon" %% "kamon-bundle" % "2.1.0",
+  "io.kamon" %% "kamon-influxdb" % "2.1.0"
 )
 
 PlayKeys.externalizeResourcesExcludes += baseDirectory.value / "conf" / "META-INF" / "persistence.xml"
