@@ -78,7 +78,7 @@ framework_tests = {
     "play2-scala-slick-netty": [query, db, fortune],
 }
 
-def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None, singleConfig=False, duration=None, cmd="./tfb"):
+def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None, singleConfig=False, duration=None, cmd="./tfb", addTags=False):
     def genBenchmarkId(concurrency, pipelineConcurrency, query):
         name = "%s_%s_%s" % (framework, benchmark.name, mode)
         if concurrency is not None:
@@ -88,6 +88,22 @@ def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None, sing
         if query is not None:
             name += "_query-%d" % (query)
         return name
+
+    def genTags(concurrency, pipelineConcurrency, query):
+        def addArg(args, tag, value):
+            args += " %s=%s" % (tag, value)
+            return args
+        args = ""
+        args = addArg(args, "app_framework", framework)
+        args = addArg(args, "app_bench", benchmark.name)
+        if concurrency is not None:
+            args = addArg(args, "concurrency", str(concurrency))
+        if pipelineConcurrency is not None:
+            args = addArg(args, "pipeline_concurrency", str(pipelineConcurrency))
+        if query is not None:
+            args = addArg(args, "query", str(query))
+
+        return args
 
     concurrencyLevels = benchmark.getConcurrencyLevels(singleConfig)
     pipelineConcurrencyLevels = benchmark.getPipelineConcurrencyLevels(singleConfig)
@@ -117,6 +133,9 @@ def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None, sing
                 if run_prefix is not None:
                     run_name = "%s%s" % (run_prefix, benchmarkId)
                     command += " --results-dir %s" % (run_name)
+                if addTags:
+                    tags = genTags(concurrency, pipelineConcurrency, query)
+                    command += " --kamon-args %s" % (tags)
                 if log_dir is not None:
                     log = "%s/%s" % (log_dir, benchmarkId)
                     command += " > %s.txt " % (log)
@@ -131,7 +150,7 @@ def main():
     for framework in frameworks:
         tests = framework_tests[framework]
         for test in tests:
-            runBenchmark(framework, test, "benchmark", log_dir="run_logs", run_prefix="")
+            runBenchmark(framework, test, "benchmark", log_dir="run_logs", run_prefix="", cmd="./running_scripts/launch_local.sh",addTags=True, duration="60", singleConfig=True)
 
 if __name__ == "__main__":
     main()
