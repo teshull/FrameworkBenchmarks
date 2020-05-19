@@ -14,21 +14,21 @@ class Benchmark:
         self.hasPipelineConcurrencyOptions = hasPipelineConcurrency
         self.hasQueryOptions = hasQuery
 
-    def getConcurrencyLevels(self):
+    def getConcurrencyLevels(self, singleConfig):
         if self.hasConcurrencyOptions:
-            return Benchmark.concurrencyLevels
+            return [128] if singleConfig else Benchmark.concurrencyLevels
         else:
             return [None]
 
-    def getPipelineConcurrencyLevels(self):
+    def getPipelineConcurrencyLevels(self, singleConfig):
         if self.hasPipelineConcurrencyOptions:
-            return Benchmark.pipelineConcurrencyLevels
+            return [4096] if singleConfig else Benchmark.pipelineConcurrencyLevels
         else:
             return [None]
 
-    def getQueryLevels(self):
+    def getQueryLevels(self, singleConfig):
         if self.hasQueryOptions:
-            return Benchmark.queryLevels
+            return [10] if singleConfig else Benchmark.queryLevels
         else:
             return [None]
 
@@ -78,7 +78,7 @@ framework_tests = {
     "play2-scala-slick-netty": [query, db, fortune],
 }
 
-def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None):
+def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None, singleConfig=False, duration=None, cmd="./tfb"):
     def genBenchmarkId(concurrency, pipelineConcurrency, query):
         name = "%s_%s_%s" % (framework, benchmark.name, mode)
         if concurrency is not None:
@@ -89,16 +89,19 @@ def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None):
             name += "_query-%d" % (query)
         return name
 
-    concurrencyLevels = benchmark.getConcurrencyLevels()
-    pipelineConcurrencyLevels = benchmark.getPipelineConcurrencyLevels()
-    queryLevels = benchmark.getQueryLevels()
+    concurrencyLevels = benchmark.getConcurrencyLevels(singleConfig)
+    pipelineConcurrencyLevels = benchmark.getPipelineConcurrencyLevels(singleConfig)
+    queryLevels = benchmark.getQueryLevels(singleConfig)
 
     #ensuring log dir exists
     if log_dir is not None and not os.path.exists(log_dir):
         os.mkdir(log_dir)
 
-    command_prefix = "./tfb --mode %s --test %s --type %s" \
-        % (mode, framework, benchmark.name)
+    command_prefix = "%s --mode %s --test %s --type %s" \
+        % (cmd, mode, framework, benchmark.name)
+
+    if duration is not None:
+        command_prefix += " --duration %s" % (duration)
 
     for concurrency in concurrencyLevels:
         for pipelineConcurrency in pipelineConcurrencyLevels:
@@ -128,7 +131,7 @@ def main():
     for framework in frameworks:
         tests = framework_tests[framework]
         for test in tests:
-            runBenchmark(framework, test, "benchmark", "run_logs", "")
+            runBenchmark(framework, test, "benchmark", log_dir="run_logs", run_prefix="")
 
 if __name__ == "__main__":
     main()
