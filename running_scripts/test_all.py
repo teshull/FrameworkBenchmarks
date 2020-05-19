@@ -80,13 +80,13 @@ framework_tests = {
 
 def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None):
     def genBenchmarkId(concurrency, pipelineConcurrency, query):
-        name = "%s$%s$%s" % (framework, benchmark.name, mode)
+        name = "%s_%s_%s" % (framework, benchmark.name, mode)
         if concurrency is not None:
-            name += "$concurrency-%d" % (concurrency)
+            name += "_concurrency-%d" % (concurrency)
         if pipelineConcurrency is not None:
-            name += "$pipelineConcurrency-%d" % (pipelineConcurrency)
+            name += "_pipelineConcurrency-%d" % (pipelineConcurrency)
         if query is not None:
-            name += "$query-%d" % (query)
+            name += "_query-%d" % (query)
         return name
 
     concurrencyLevels = benchmark.getConcurrencyLevels()
@@ -94,7 +94,7 @@ def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None):
     queryLevels = benchmark.getQueryLevels()
 
     #ensuring log dir exists
-    if log_dir is not None:
+    if log_dir is not None and not os.path.exists(log_dir):
         os.mkdir(log_dir)
 
     command_prefix = "./tfb --mode %s --test %s --type %s" \
@@ -103,7 +103,6 @@ def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None):
     for concurrency in concurrencyLevels:
         for pipelineConcurrency in pipelineConcurrencyLevels:
             for query in queryLevels:
-                print(concurrency, pipelineConcurrency, query)
                 command = ""
                 if concurrency is not None:
                     command += " --concurrency-levels %d" % (concurrency)
@@ -120,6 +119,7 @@ def runBenchmark(framework, benchmark, mode, log_dir=None, run_prefix=None):
                     command += " > %s.txt " % (log)
                 command = "%s %s" % (command_prefix, command)
                 print(command)
+                os.system(command)
 
 def main():
     script_dir = os.getenv("FRAMEWORK_DIR")
@@ -128,7 +128,7 @@ def main():
     for framework in frameworks:
         tests = framework_tests[framework]
         for test in tests:
-            runBenchmark(framework, test, "benchmark", "run_results", "")
+            runBenchmark(framework, test, "benchmark", "run_logs", "")
 
 if __name__ == "__main__":
     main()

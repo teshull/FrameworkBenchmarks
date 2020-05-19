@@ -29,7 +29,9 @@ def main():
     os.chdir(script_dir)
 
     #making log dir
-    os.mkdir("run_logs")
+    log_dir = "run_logs"
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir)
 
     base_command = "./tfb --mode verify --test %s > run_logs/%s.txt"
     for framework in frameworks:
