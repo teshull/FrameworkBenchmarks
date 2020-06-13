@@ -150,7 +150,7 @@ def main():
     for framework in frameworks:
         tests = framework_tests[framework]
         for test in tests:
-            runBenchmark(framework, test, "benchmark", log_dir="run_logs", run_prefix="", cmd="./running_scripts/launch_local.sh",addTags=True, duration="60", singleConfig=True)
+            runBenchmark(framework, test, "benchmark", log_dir="run_logs", run_prefix="", cmd="./running_scripts/launch_local.sh",addTags=True, duration="120", singleConfig=True)
 
 if __name__ == "__main__":
     main()
